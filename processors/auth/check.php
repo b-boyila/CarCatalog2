@@ -35,7 +35,7 @@ if (isset($_COOKIE['id']) and isset($_COOKIE['hash']))
 
         setcookie("hash", "", time() - 3600*24*30*12, "/");
 
-        print "Хм, что-то не получилось";
+        header("Location: /index.php"); exit();
 
     }
 

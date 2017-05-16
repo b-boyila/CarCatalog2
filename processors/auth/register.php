@@ -67,10 +67,11 @@ if(isset($_POST['submit']))
 
         $secret = trim($_POST['secret']);
 
+        $email = trim($_POST['email']);
 
-        mysql_query("INSERT INTO users SET user_login='".$login."', user_password='".$password."', user_secret='".$secret."'");
+        mysql_query("INSERT INTO users SET user_login='".$login."', user_password='".$password."', user_secret='".$secret."', user_email='".$email."'");
 
-        header("Location: index.php"); exit();
+        header("Location: login.php"); exit();
 
     }
 
@@ -117,6 +118,9 @@ if(isset($_POST['submit']))
         <h2 class="form-signin-heading">Регистрация</h2>
         <div class="form-group">
             <input name="login" type="text" class="form-control" placeholder="Логин" required>
+        </div>
+        <div class="form-group">
+            <input name="email" type="email" class="form-control" placeholder="E-mail" required>
         </div>
         <div class="form-group">
             <input name="password" type="password" class="form-control" placeholder="Ключ" required>
