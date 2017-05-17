@@ -6,10 +6,6 @@ class constants
     const CONTENT_TYPE = 'Content-type: text/html; charset=utf-8';
 
     //База данных
-    const LOCALHOST = 'localhost';
-    const USER_DB = 'crypto';
-    const PASSWORD = 'p*Kcq679';
-    const DATABASE = 'crypto';
     const MYSQLi_CONNECT_ERROR = 'Не удалось подключиться к MySQL: ';
 
 
