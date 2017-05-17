@@ -24,7 +24,7 @@ if (isset($id) and isset($hash)) {
         redirectToLogin();
     } else {
         $log = new KLogger (constants::LOG_PATH . $user['user_login'] . constants::LOG_TYPE, KLogger::DEBUG);
-        $log->LogInfo(constants::SIGN_IN);
+        $log->logInfo(constants::SIGN_IN);
         ?>
         <!DOCTYPE html>
         <html>
@@ -156,7 +156,7 @@ function getUser($mysqli, $id)
 function logout($user)
 {
     $log = new KLogger (constants::LOG_PATH . $user['user_login'] . constants::LOG_TYPE, KLogger::DEBUG);
-    $log->LogInfo(constants::LOGOUT);
+    $log->logInfo(constants::LOGOUT);
     setcookie("WebEngineerRestrictedArea", "", time() - 60 * 60 * 24);
     setcookie("id", "", time() - 60 * 60 * 24);
     setcookie("hash", "", time() - 60 * 60 * 24);
