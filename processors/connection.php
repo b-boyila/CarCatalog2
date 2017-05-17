@@ -1,5 +1,6 @@
 <?php
 require_once 'logger.php';
+require_once 'connect.php';
 require_once 'constants.php';
 header(constants::CONTENT_TYPE);
 $systemLog = new KLogger (constants::SYSTEM_LOG_PATH, KLogger::DEBUG );
