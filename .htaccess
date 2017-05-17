@@ -1,4 +1,3 @@
 RewriteEngine On
 RewriteCond %{HTTPS} =off
-RewriteCond %{REQUEST_URI} !^/test.php
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [QSA,L]
