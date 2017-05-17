@@ -1,97 +1,51 @@
 <?php
-header('Content-type: text/html; charset=utf-8');
+require_once '../logger.php';
+require_once '../constants.php';
+require_once '../connection.php';
 
-mysql_connect("localhost", "crypto", "p*Kcq679");
-
-mysql_select_db("crypto");
-
-mysql_query('SET NAMES utf8');
-
-if(isset($_POST['submit']))
-
-{
-
-    $err = array();
-
-
-    # проверям логин
-
-    if(!preg_match("/^[a-zA-Z0-9]+$/",$_POST['login']))
-
-    {
-
-        $err[] = "Логин может состоять только из букв английского алфавита и цифр!";
-
-    }
-
-
-
-    if(strlen($_POST['login']) < 3 or strlen($_POST['login']) > 30)
-
-    {
-
-        $err[] = "Логин должен быть не меньше 3-х символов и не больше 30!";
-
-    }
-
-
-
-    # проверяем, не сущестует ли пользователя с таким именем
-
-    $query = mysql_query("SELECT COUNT(user_id) FROM users WHERE user_login='".mysql_real_escape_string($_POST['login'])."'");
-
-    if(mysql_result($query, 0) > 0)
-
-    {
-
-        $err[] = "Пользователь с таким логином уже существует в базе данных";
-
-    }
-
-
-
-    # Если нет ошибок, то добавляем в БД нового пользователя
-
-    if(count($err) == 0)
-
-    {
-
-
-        $login = trim($_POST['login']);
-
-
-
-        # Убераем лишние пробелы и делаем двойное шифрование
-
-        $password = md5(md5(trim($_POST['password'])));
-
-        $secret = trim($_POST['secret']);
-
-        $email = trim($_POST['email']);
-
-        mysql_query("INSERT INTO users SET user_login='".$login."', user_password='".$password."', user_secret='".$secret."', user_email='".$email."'");
-
-        header("Location: login.php"); exit();
-
-    }
-
-    else
-
-    {
+if (isset($_POST['submit'])) {
+    $err = validation($mysqli);
+    if (count($err) == 0) {
+        createUser($mysqli);
+    } else {
         print '<div style="z-index: 99999; padding: 30px; position: absolute">';
-        foreach($err AS $error)
-
-        {
+        foreach ($err AS $error) {
             print '<div style="z-index: 99999;" class="alert alert-danger alert-dismissible " role="alert"><a onclick="closeAlert(this);" class="close" data-dismiss="alert" aria-label="close">&times;</a>' . $error . '</div>';
         }
         print ' </div>';
     }
+}
 
+function validation($mysqli){
+    $err = array();
+    if (!preg_match("/^[a-zA-Z0-9]+$/", $_POST['login'])) {
+        $err[] = constants::LOGIN_ONLY_LETTERS;
+    }
+    if (strlen($_POST['login']) < 3 or strlen($_POST['login']) > 30) {
+        $err[] = constants::LOGIN_ONLY_3_30;
+    }
+    $query = mysqli_query($mysqli, "SELECT COUNT(user_id) FROM users WHERE user_login='" . mysqli_real_escape_string($mysqli, $_POST['login']) . "'");
+    $users = mysqli_fetch_row($query);
+    if ($users[0] > 0) {
+        $err[] = constants::LOGIN_DUPLICATE;
+    }
+    return $err;
+}
+
+function createUser($mysqli){
+    $login = trim($_POST['login']);
+    $password = md5(md5(trim($_POST['password'])));
+    $secret = trim($_POST['secret']);
+    $email = trim($_POST['email']);
+    mysqli_query($mysqli, "INSERT INTO users SET user_login='" . $login . "', user_password='" . $password . "', user_secret='" . $secret . "', user_email='" . $email . "'");
+    header("Location: login.php");
+    exit();
 }
 
 ?>
 
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -113,9 +67,12 @@ if(isset($_POST['submit']))
 <body>
 
 <article>
-    <h1><span><a style="border-bottom-style: dotted; border-bottom-width: 1px;" href="https://webdivision.pro/about/">Web Studio «WebDivision»</a></span></h1>
+    <h1><span><a style="border-bottom-style: dotted; border-bottom-width: 1px;" href="https://webdivision.pro/about/">Web
+                Studio «WebDivision»</a></span></h1>
+
     <form class="form-signin" method="POST">
         <h2 class="form-signin-heading">Регистрация</h2>
+
         <div class="form-group">
             <input name="login" type="text" class="form-control" placeholder="Логин" required>
         </div>
@@ -132,7 +89,8 @@ if(isset($_POST['submit']))
             <input name="submit" class="btn btn-lg btn-primary btn-block" type="submit" value="Зарегистрироваться">
         </div>
         <div style="text-align: center" class="form-group">
-            <a style="color: white; border-bottom-style: dotted; border-bottom-width: 1px;" href="login.php">Авторизация</a>
+            <a style="color: white; border-bottom-style: dotted; border-bottom-width: 1px;"
+               href="login.php">Авторизация</a>
         </div>
     </form>
 </article>
