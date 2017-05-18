@@ -23,8 +23,12 @@ if (isset($id) and isset($hash)) {
     if (($user_hash !== $hash) or ($user_id !== $id) or (($user_ip !== $remote_address) and ($user_ip !== "0"))) {
         redirectToLogin();
     } else {
-        $log = new KLogger (constants::LOG_PATH . $user['user_login'] . constants::LOG_TYPE, KLogger::DEBUG);
-        $log->logInfo(constants::SIGN_IN);
+        //Не добавлять в лог запись при обновлении страницы
+        if($_COOKIE['userCheckSuccess'] == ''){
+            $log = new KLogger (constants::LOG_PATH . $user['user_login'] . constants::LOG_TYPE, KLogger::DEBUG);
+            $log->logInfo(constants::SIGN_IN);
+            setcookie("userCheckSuccess", "true", time() + 60 * 60 * 24 * 30, '/');
+        }
         ?>
         <!DOCTYPE html>
         <html>
@@ -115,10 +119,8 @@ if (isset($id) and isset($hash)) {
                     <span style="font-size: 17px;">Консоль</span>
 
                     <p>
-                        <samp>
-                            20.06.17 20:41 Добро пожаловать!<br/>
-                            20.06.17 22:42 Запуск бота..<br/>
-                            20.06.17 00:41 Анализируем графики...<br/>
+                        <samp style="overflow-y: scroll;" id="console-cr">
+                            
                         </samp>
                     </p>
                 </div>
@@ -160,6 +162,8 @@ function logout($user)
     setcookie("WebEngineerRestrictedArea", "", time() - 60 * 60 * 24);
     setcookie("id", "", time() - 60 * 60 * 24);
     setcookie("hash", "", time() - 60 * 60 * 24);
+    setcookie("userLogin", "", time() + 60 * 60 * 24, '/');
+    setcookie("userCheckSuccess", "", time() + 60 * 60 * 24, '/');
     header("Location: /index.php");
     exit();
 }
