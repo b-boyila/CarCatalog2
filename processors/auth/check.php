@@ -95,15 +95,18 @@ if (isset($id) and isset($hash)) {
                             <input class="form-control" id="deposit" placeholder="Депозит" name="deposit">
                         </div>
                         <div class="form-group">
-                            <input class="form-control" id="step" placeholder="Шаг" name="step">
+                            <input class="form-control" id="step-ct" placeholder="Шаг" name="step" onFocus="this.select();" onKeyUp="changeStep();">
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-info">Анализировать</button>
+                            <input style="width: 100%;" class="btn btn-info" value="Анализировать" onclick="analyze()" type="button">
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-success">Торговать</button>
                         </div>
                     </form>
+                </div>
+                <div class="col-sm-3 col-md-2 col-xs-7">
+                    <p id="interval-ct" style="font-size: 15px; margin-top: 100px;">Интервал</p>
                 </div>
             </div>
             <div style="padding-top: 15px" class="row">
@@ -125,6 +128,7 @@ if (isset($id) and isset($hash)) {
                     </p>
                 </div>
             </div>
+            <div class="result">Ответ</div>>
             <div style="padding-top: 40px" class="row">
                 <div style="text-align: center" class="col-sm-12">
                     <span><a style="border-bottom-style: dotted; border-bottom-width: 1px;"
