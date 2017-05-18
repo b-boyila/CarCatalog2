@@ -16,9 +16,10 @@ function changeStep() {
 }
 
 function analyze() {
-	$.post("/processors/btc/macd.php", {step: step}, function(data) {
-  		$('.result').html(data);
-	});
+    $.post("/processors/btc/macd.php", {step: step}, function (data) {
+        $('.result').html(data);
+    });
+}
 
 function getLog() {
     var last = $('#console-cr span:last').text();
