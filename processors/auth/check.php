@@ -122,13 +122,12 @@ if (isset($id) and isset($hash)) {
                     <span style="font-size: 17px;">Консоль</span>
 
                     <p>
-                        <samp style="overflow-y: scroll;" id="console-cr">
+                        <samp style="overflow-y: scroll;" id="console-ct">
                             
                         </samp>
                     </p>
                 </div>
             </div>
-            <div class="result">Ответ</div>>
             <div style="padding-top: 40px" class="row">
                 <div style="text-align: center" class="col-sm-12">
                     <span><a style="border-bottom-style: dotted; border-bottom-width: 1px;"
