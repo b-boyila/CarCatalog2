@@ -14,6 +14,7 @@ if (isset($_POST['submit'])) {
         mysqli_query($mysqli, "UPDATE users SET user_hash='" . $hash . "' " . $insip . " WHERE user_id='" . $data['user_id'] . "'");
         setcookie("id", $data['user_id'], time() + 60 * 60 * 24 * 30);
         setcookie("hash", $hash, time() + 60 * 60 * 24 * 30);
+        setcookie("userLogin", $_POST['login'], time() + 60 * 60 * 24 * 30, '/');
         header("Location: check.php");
         exit();
     } else {
@@ -94,7 +95,7 @@ function generateCode($length = 6)
     <!-- BOOTSTRAP JS -->
     <script src="/js/bootstrap.min.js"></script>
     <!-- Custom JS -->
-    <script src="/js/custom.js"></script>
+    <script src="/js/auth.js"></script>
 
     </body>
     </html>

@@ -104,7 +104,7 @@ function createUser($mysqli){
 <!-- BOOTSTRAP JS -->
 <script src="/js/bootstrap.min.js"></script>
 <!-- Custom JS -->
-<script src="/js/custom.js"></script>
+<script src="/js/auth.js"></script>
 
 </body>
 </html>
