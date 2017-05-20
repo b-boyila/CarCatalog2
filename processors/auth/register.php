@@ -1,7 +1,7 @@
 <?php
-require_once '../logger.php';
-require_once '../constants.php';
-require_once '../connection.php';
+require_once '../helper/logger/logger.php';
+require_once '../helper/constants.php';
+require_once '../helper/db/connection.php';
 
 if (isset($_POST['submit'])) {
     $err = validation($mysqli);

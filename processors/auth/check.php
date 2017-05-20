@@ -1,8 +1,8 @@
 <?php
 
-require_once '../logger.php';
-require_once '../constants.php';
-require_once '../connection.php';
+require_once '../helper/logger/logger.php';
+require_once '../helper/constants.php';
+require_once '../helper/db/connection.php';
 
 $id = intval($_COOKIE['id']);
 $hash = $_COOKIE['hash'];
@@ -95,18 +95,18 @@ if (isset($id) and isset($hash)) {
                             <input class="form-control" id="deposit" placeholder="Депозит" name="deposit">
                         </div>
                         <div class="form-group">
-                            <input class="form-control" id="step-ct" placeholder="Шаг" name="step" onFocus="this.select();" onKeyUp="changeStep();">
+                            <input class="form-control" id="step-ct" placeholder="Шаг" name="step" onFocus="this.select();" onKeyUp="addInterval();">
                         </div>
                         <div class="form-group">
-                            <input style="width: 100%;" class="btn btn-info" value="Анализировать" onclick="analyze()" type="button">
+                            <input style="width: 100%;" class="btn btn-info" value="Анализировать" onclick="onAnalyze();" type="button">
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-success">Торговать</button>
+                            <input style="width: 100%;"  class="btn btn-success" value="Торговать" onclick="onTrade();" type="button">
                         </div>
                     </form>
                 </div>
                 <div class="col-sm-3 col-md-2 col-xs-7">
-                    <p id="interval-ct" style="font-size: 15px; margin-top: 100px;">Интервал</p>
+                    <p id="interval-ct" style="font-size: 15px; margin-top: 100px;"></p>
                 </div>
             </div>
             <div style="padding-top: 15px" class="row">
