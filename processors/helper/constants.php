@@ -18,6 +18,14 @@ class constants
     const LOGIN_ONLY_LETTERS = 'Логин может состоять только из букв английского алфавита и цифр!';
     const LOGIN_ONLY_3_30 = 'Логин должен быть не меньше 3-х символов и не больше 30!';
     const LOGIN_DUPLICATE = 'Пользователь с таким логином уже существует в базе данных!';
+    const EMPTY_VALUE = 'Пустые значения!';
+    
+    //Крон
+    const TASK_FILE = 'cronTask.txt';
+    const EVERY_MINUTE = '*/1 * * * *';
+    const INTERPETER = '/usr/bin/php -f';
+    const ADD_TASK = 'Задача добавлена в крон!';
+    const DELETE_TASK = 'Задача удалена из крон!';
 }
 
 ?>

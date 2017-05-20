@@ -11,7 +11,7 @@ for ($i = 0; $i < count($arr); $i++) {
             $log =  $log . '<span>' . $arr[$i] . '</span><br/>';
             continue;
         }
-        if($arr[$i] == $lastLogLine){
+        if($arr[$i] == $lastLogLine and $arr[$i+1] != $lastLogLine){
            $isRead = true;
         }
 }

@@ -1,7 +1,7 @@
 <?php
-require_once '../logger.php';
-require_once '../constants.php';
-require_once '../connection.php';
+require_once '../helper/logger/logger.php';
+require_once '../helper/constants.php';
+require_once '../helper/db/connection.php';
 
 if (isset($_POST['submit'])) {
     $query = mysqli_query($mysqli, "SELECT user_id, user_password FROM users WHERE user_login='" . mysqli_real_escape_string($mysqli, $_POST['login']) . "' LIMIT 1");
