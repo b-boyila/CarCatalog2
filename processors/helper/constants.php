@@ -26,6 +26,10 @@ class constants
     const INTERPETER = '/usr/bin/php -f';
     const ADD_TASK = 'Задача добавлена в крон!';
     const DELETE_TASK = 'Задача удалена из крон!';
+
+    //CSV
+    const CSV_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/processors/btc/ticker/history/';
+    const CSV_TYPE = '.csv';
 }
 
 ?>
