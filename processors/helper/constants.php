@@ -21,11 +21,15 @@ class constants
     const EMPTY_VALUE = 'Пустые значения!';
     
     //Крон
-    const TASK_FILE = 'cronTask.txt';
+    const TASK_FILE = '/var/www/vhosts/crypto-trader.ru/httpdocs/processors/helper/cron/cronTask.txt';
     const EVERY_MINUTE = '*/1 * * * *';
     const INTERPETER = '/usr/bin/php -f';
     const ADD_TASK = 'Задача добавлена в крон!';
     const DELETE_TASK = 'Задача удалена из крон!';
+
+    //CSV
+    const CSV_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/processors/btc/ticker/history/';
+    const CSV_TYPE = '.csv';
 }
 
 ?>

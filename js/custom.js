@@ -11,7 +11,7 @@ function addInterval() {
 
 function onAnalyze() {
     var step = $('#step-ct').val();
-    $.post("/processors/helper/cron/cron.php", {step: step, action: 'analyze'}, function (data) {
+    $.post("/processors/helper/cron/cron.php", {step: step, action: 'analyze.php'}, function (data) {
         var response = JSON.parse(data);
         if (response.success) {
             console.log(response.message);
@@ -23,7 +23,7 @@ function onAnalyze() {
 
 function onTrade() {
     var step = $('#step-ct').val();
-    $.post("/processors/helper/cron/cron.php", {step: step, action: 'trade'}, function (data) {
+    $.post("/processors/helper/cron/cron.php", {step: step, action: 'trade.php'}, function (data) {
         var response = JSON.parse(data);
         if (response.success) {
             console.log(response.message);

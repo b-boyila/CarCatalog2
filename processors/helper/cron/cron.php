@@ -2,10 +2,10 @@
 require_once '../logger/logger.php';
 require_once '../constants.php';
 require_once '../db/connection.php';
-$log = new KLogger (constants::LOG_PATH . $user['user_login'] . constants::LOG_TYPE, KLogger::DEBUG);
 $step = $_POST['step'];
 $action = $_POST['action'];
 $user_login = $_COOKIE['userLogin'];
+$log = new KLogger (constants::LOG_PATH . $user_login . constants::LOG_TYPE, KLogger::DEBUG);
 
 if(empty($step) or empty($action)){
     $log->logError(constants::EMPTY_VALUE);
@@ -14,19 +14,19 @@ if(empty($step) or empty($action)){
 
 if(isActiveTask($user_login, $action)){
     deleteTask($user_login);
-    $log->logInfo(constants::DELETE_TASK);
-    echo(responseMessage(true, constants::DELETE_TASK));
+    $log->logInfo(constants::DELETE_TASK . ' ' . $action);
+    echo(responseMessage(true, constants::DELETE_TASK . ' ' . $action));
 } else {
     deleteTask($user_login);
     addTask($user_login, $action, $step);
-    $log->logInfo(constants::ADD_TASK);
-    echo(responseMessage(true, constants::ADD_TASK));
+    $log->logInfo(constants::ADD_TASK . ' ' . $action);
+    echo(responseMessage(true, constants::ADD_TASK . ' ' . $action));
 }
 
 function addTask($user_login, $action, $step){
-    $pathCronTaskFile  = dirname(__FILE__) . '/' . constants::TASK_FILE;
+    $pathCronTaskFile = constants::TASK_FILE;
     $allTask = shell_exec('crontab -l');
-    $addTask = constants::EVERY_MINUTE . ' ' . constants::INTERPETER .' ' .  dirname(__FILE__) . '/../../btc/' . $action . '.php ';
+    $addTask = constants::EVERY_MINUTE . ' ' . constants::INTERPETER .' ' .  dirname(__FILE__) . '/../../btc/' . $action;
     $params = ' -- "' . $user_login .'" "' . $step . '"';
     file_put_contents($pathCronTaskFile, $allTask . $addTask . $params .PHP_EOL);
     exec('crontab ' . $pathCronTaskFile);
@@ -34,21 +34,20 @@ function addTask($user_login, $action, $step){
 }
 
 function deleteTask($user_login){
-    $pathCronTaskFile  = dirname(__FILE__) . '/' . constants::TASK_FILE;
+    $pathCronTaskFile = constants::TASK_FILE;
     $tasks = file($pathCronTaskFile);
-    $stack = array();
     for ($i = 0; $i < count($tasks); $i++) {
         $isTask = strpos($tasks[$i], $user_login);
-        if($isTask === false){
-            array_push($stack, $tasks[$i]);
+        if($isTask !== false){
+            unset($tasks[$i]);
         }
     }
-    file_put_contents($pathCronTaskFile, implode("",$stack), LOCK_EX);
+    file_put_contents($pathCronTaskFile, implode("", $tasks), LOCK_EX);
     exec('crontab ' . $pathCronTaskFile);
 }
 
 function isActiveTask($user_login, $action){
-    $pathCronTaskFile  = dirname(__FILE__) . '/' . constants::TASK_FILE;
+    $pathCronTaskFile = constants::TASK_FILE;
     $tasks = file($pathCronTaskFile);
     for ($i = 0; $i < count($tasks); $i++) {
         $isTask = strpos($tasks[$i], $user_login);
