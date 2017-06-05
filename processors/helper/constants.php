@@ -30,6 +30,7 @@ class constants
     //CSV
     const CSV_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/processors/btc/ticker/history/';
     const CSV_TYPE = '.csv';
+
 }
 
 ?>
