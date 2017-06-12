@@ -12,6 +12,7 @@ class constants
     const SYSTEM_LOG_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/logs/system.txt';
     const LOG_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/logs/';
     const LOG_TYPE = '.txt';
+    const LOG_USER_SIZE = 100;
     const SIGN_IN = 'Вход в систему';
     const LOGOUT = 'Выход из системы';
     const LOGIN_OR_PASSWORD_NOT_VALID = 'Вы ввели неправильный логин/пароль!';
@@ -30,6 +31,7 @@ class constants
     //CSV
     const CSV_PATH = '/var/www/vhosts/crypto-trader.ru/httpdocs/processors/btc/ticker/history/';
     const CSV_TYPE = '.csv';
+    const LOG_PAIR_SIZE = 100;
 
     //MACD
     const FOR_CALCULATE = 35;
