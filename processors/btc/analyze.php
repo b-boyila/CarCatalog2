@@ -5,118 +5,97 @@ require_once dirname(__FILE__) . '/btce-api.php';
 
 $user_login = $argv[1];
 $step = $argv[2];
-
 $pair = 'btc_usd';
 
-if (($pairs = fopen(constants::CSV_PATH . $pair . constants::CSV_TYPE, "r")) !== FALSE) {
+$last_prices_trades = getLastPricesTradesPair($pair, $step);
+$ema1_values = getEma1Values($last_prices_trades);
+$ema2_values = getEma2Values($last_prices_trades);
+$macd_line_values = getMacdLineValues($ema1_values, $ema2_values);
+$signal_line_values = getSignalLineValues($macd_line_values);
+$histogram_values = getHistogramValues($macd_line_values, $signal_line_values);
+$reaction = chooseReaction($histogram_values);
 
-    $l = 0;
-    while (($pair = fgetcsv($pairs, 1000, ";")) !== FALSE) {
+$log = new KLogger (constants::LOG_PATH . $user_login . constants::LOG_TYPE, KLogger::DEBUG);
+$log->logInfo('Анализировать.. Пользователь: ' . $user_login . ' Шаг: ' . $step . ' histogram(До)=' . $histogram_values[0] . ', histogram(Сейчас)=' . $histogram_values[1]. ' ---> ' . $reaction);
 
-        $last[$l] = $pair[5];
-
-        $l++;
-    }
-    fclose($pairs);
-
-    $startIndex = $l - (35 * $step);
-    $ema1 = array();
-    $ema2 = array();
-    $macdLine = array();
-    $signalLine = array();
-    for ($n = 0; $n < 35; $n++) {
-
-        if ($n == 11) {
-            $ema1[0] = 0;
-            for ($i = 0; $i <= 11; $i++) {
-                $ema1[0] += $last[$startIndex + ($i * $step)];
-            }
-            $ema1[0] = $ema1[0] / 12;
-        }
-
-        if ($n > 11) {
-            $ema1[$n - 11] = ((2 / (1 + 12)) * $last[$startIndex + ($n * $step)]) + (((1 - (2 / (1 + 12))) * $ema1[$n - 12]));
-        }
-
-        if ($n == 25) {
-            $ema2[0] = 0;
-            for ($i = 0; $i <= 25; $i++) {
-                $ema2[0] += $last[$startIndex + ($i * $step)];
-            }
-            $ema2[0] = $ema2[0] / 26;
-            $macdLine[0] = $ema1[$n - 11] - $ema2[$n - 25];
-        }
-
-        if ($n > 25) {
-            $ema2[$n - 25] = ((2 / (1 + 26)) * $last[$startIndex + ($n * $step)]) + (((1 - (2 / (1 + 26))) * $ema2[$n - 26]));
-            $macdLine[$n - 25] = $ema1[$n - 11] - $ema2[$n - 25];
-        }
-
-        if ($n >= 33) {
-            $signalLine[$n - 33] = 0;
-            for ($i = 0; $i <= 9; $i++) {
-                $signalLine[$n - 33] += $macdLine[$n - 33 + $i];
-            }
-            $signalLine[$n - 33] = $signalLine[$n - 33] / 9;
-            $histogram[$n - 33] = $macdLine[$n - 25] - $signalLine[$n - 33];
-        }
-
-    }
-    $msg = 'Ничего не делаем';
-    if (($histogram[0] < 0) && ($histogram[1] > 0)) $msg = 'Нужно покупать!';
-    if (($histogram[0] > 0) && ($histogram[1] < 0)) $msg = 'Нужно продавать!';
-
-    $log = new KLogger (constants::LOG_PATH . $user_login . constants::LOG_TYPE, KLogger::DEBUG);
-    $log->logInfo('Анализировать.. Пользователь: ' . $user_login . ' Шаг: ' . $step . ' histogram1=' . $histogram[0] . ', histogram2=' . $histogram[1] . ' -> ' . $msg);
-}
-
-/*###########################################################################*/
-
-
-$last_price_orders = getLastPriceOrdersPair($pair, $step);
-$average_value = getAvarageValue($last_price_orders);
-$ema1_values = getEma1Values($last_price_orders, $average_value);
-
-function getLastPriceOrdersPair($pair, $step)
+function getLastPricesTradesPair($pair, $step)
 {
-    $last_price_orders = array();
+    $last_prices_trades = array();
     if (($pairs = fopen(constants::CSV_PATH . $pair . constants::CSV_TYPE, "r")) !== FALSE) {
-        $count = 1;
         while (($pair = fgetcsv($pairs, 1000, ";")) !== FALSE) {
-            if ($step == $count) {
-                array_push($last_price_orders, $pair[5]);
-                $count = 1;
-            }
-            $count++;
+            array_push($last_prices_trades, $pair[5]);
         }
         fclose($pairs);
     }
-    return getSliceLastPriceOrders($last_price_orders, $step);
+    $last_prices_trades_for_macd = array();
+    for($i = 0; $i < constants::FOR_CALCULATE; $i++) {
+    	array_push($last_prices_trades_for_macd, $last_prices_trades[count($last_prices_trades) - 1 - ($step * $i)]);
+    }
+    return $last_prices_trades_for_macd;
 }
 
-function getSliceLastPriceOrders($last_price_orders, $step){
-    $start_line_for_calculate = count($last_price_orders) - (constants::FOR_CALCULATE * $step);
-    return array_slice($last_price_orders, -$start_line_for_calculate);
-}
-
-function getAvarageValue($last_price_orders) {
-    $last_price_orders= array_slice($last_price_orders, 0, 12);
-    $avarage_value = array_sum($last_price_orders) / 12;
+function getAvarageValue($array, $start_index, $count) {
+    $array= array_slice($array, $start_index, $count);
+    $avarage_value = array_sum($array) / $count;
     return $avarage_value;
 }
 
-function getEma1Values($last_price_orders, $average_value) {
+function getEma1Values($last_prices_trades) {
     $ema1_values = array();
-    $last_price_orders = array_slice($last_price_orders, 11, 25);
-    $ema1_pre_value = $average_value;
-    for($i = 0; $i < count($last_price_orders); $i++){
-        if($i > 0){
-            $ema1_pre_value = $ema1_values[$i - 1];
-        }
-        $ema1_value = ((2 / (1 + 12)) * $last_price_orders[$i]) + (((1 - (2 / (1 + 12))) * $ema1_pre_value));
+    array_push($ema1_values, getAvarageValue($last_prices_trades, 0, 12));
+    $last_prices_trades = array_slice($last_prices_trades, 11);
+    for($i = 1; $i < count($last_prices_trades); $i++) {
+        $ema1_value = ((2 / (1 + 12)) * $last_prices_trades[$i]) + (((1 - (2 / (1 + 12))) * $ema1_values[$i-1]));
         array_push($ema1_values, $ema1_value);
     }
     return $ema1_values;
 }
-/*###########################################################################*/
+
+function getEma2Values($last_prices_trades) {
+    $ema2_values = array();
+    array_push($ema2_values, getAvarageValue($last_prices_trades, 0, 26));
+    $last_prices_trades = array_slice($last_prices_trades, 25);
+    for($i = 1; $i < count($last_prices_trades); $i++) {
+        $ema2_value = ((2 / (1 + 26)) * $last_prices_trades[$i]) + (((1 - (2 / (1 + 26))) * $ema2_values[$i-1]));
+        array_push($ema2_values, $ema2_value);
+    }
+    return $ema2_values;
+}
+
+function getMacdLineValues($ema1_values, $ema2_values) {
+	$macd_line_values = array();
+	$ema1_values = array_slice($ema1_values, 14);
+	for($i = 0; $i < count($ema2_values); $i++) {
+		$macd_line_value = $ema1_values[$i] - $ema2_values[$i];
+		array_push($macd_line_values, $macd_line_value);
+	}
+	return $macd_line_values;
+}
+
+function getSignalLineValues($macd_line_values) {
+	$signal_line_values = array();
+	for($i = 0; $i < (count($macd_line_values) - 8); $i++) {
+		$signal_line_value = getAvarageValue($macd_line_values, $i, 9);
+		array_push($signal_line_values, $signal_line_value);
+	}
+	return $signal_line_values;
+}
+
+function getHistogramValues($macd_line_values, $signal_line_values) {
+	$histogram_values = array();
+	$macd_line_values = array_slice($macd_line_values, 8);
+	for($i = 0; $i < count($signal_line_values); $i++) {
+		$histogram_value = $macd_line_values[$i] - $signal_line_values[$i];
+		array_push($histogram_values, $histogram_value);
+	}
+	return $histogram_values;
+}
+
+function chooseReaction($histogram_values) {
+	$reaction = 'Ничего не делаем';
+    if (($histogram_values[0] < 0) && ($histogram_values[1] > 0)) $reaction = 'Нужно покупать!';
+    if (($histogram_values[0] > 0) && ($histogram_values[1] < 0)) $reaction = 'Нужно продавать!';
+    return $reaction;
+}
+
 ?>
