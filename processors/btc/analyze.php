@@ -13,10 +13,11 @@ $ema2_values = getEma2Values($last_prices_trades);
 $macd_line_values = getMacdLineValues($ema1_values, $ema2_values);
 $signal_line_values = getSignalLineValues($macd_line_values);
 $histogram_values = getHistogramValues($macd_line_values, $signal_line_values);
-$reaction = chooseReaction($histogram_values);
 
+$isBuy = ($histogram_values[0] < 0) && ($histogram_values[1] > 0);
+$isSell = ($histogram_values[0] > 0) && ($histogram_values[1] < 0);
 $log = new KLogger (constants::LOG_PATH . $user_login . constants::LOG_TYPE, KLogger::DEBUG);
-$log->logInfo('Анализировать.. Пользователь: ' . $user_login . ' Шаг: ' . $step . ' histogram(До)=' . $histogram_values[0] . ', histogram(Сейчас)=' . $histogram_values[1]. ' ---> ' . $reaction);
+$log->logInfo('Анализировать.. Пользователь: ' . $user_login . ' Шаг: ' . $step . ' histogram(До)=' . $histogram_values[0] . ', histogram(Сейчас)=' . $histogram_values[1]. ' isBuy=' . $isBuy. ' isSell=' . $isSell);
 
 function getLastPricesTradesPair($pair, $step)
 {
@@ -42,7 +43,8 @@ function getAvarageValue($array, $start_index, $count) {
 
 function getEma1Values($last_prices_trades) {
     $ema1_values = array();
-    array_push($ema1_values, getAvarageValue($last_prices_trades, 0, 12));
+    $average_value = getAvarageValue($last_prices_trades, 0, 12);
+    array_push($ema1_values, $average_value);
     $last_prices_trades = array_slice($last_prices_trades, 11);
     for($i = 1; $i < count($last_prices_trades); $i++) {
         $ema1_value = ((2 / (1 + 12)) * $last_prices_trades[$i]) + (((1 - (2 / (1 + 12))) * $ema1_values[$i-1]));
@@ -53,7 +55,8 @@ function getEma1Values($last_prices_trades) {
 
 function getEma2Values($last_prices_trades) {
     $ema2_values = array();
-    array_push($ema2_values, getAvarageValue($last_prices_trades, 0, 26));
+    $average_value = getAvarageValue($last_prices_trades, 0, 26);
+    array_push($ema2_values, $average_value);
     $last_prices_trades = array_slice($last_prices_trades, 25);
     for($i = 1; $i < count($last_prices_trades); $i++) {
         $ema2_value = ((2 / (1 + 26)) * $last_prices_trades[$i]) + (((1 - (2 / (1 + 26))) * $ema2_values[$i-1]));
@@ -89,13 +92,6 @@ function getHistogramValues($macd_line_values, $signal_line_values) {
 		array_push($histogram_values, $histogram_value);
 	}
 	return $histogram_values;
-}
-
-function chooseReaction($histogram_values) {
-	$reaction = 'Ничего не делаем';
-    if (($histogram_values[0] < 0) && ($histogram_values[1] > 0)) $reaction = 'Нужно покупать!';
-    if (($histogram_values[0] > 0) && ($histogram_values[1] < 0)) $reaction = 'Нужно продавать!';
-    return $reaction;
 }
 
 ?>
