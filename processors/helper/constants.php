@@ -33,8 +33,18 @@ class constants
     const CSV_TYPE = '.csv';
     const LOG_PAIR_SIZE = 100;
 
-    //MACD
-    const FOR_CALCULATE = 35;
+    //Сигнал MACD
+    const MACD_POINTS = 35;
+
+    //Сигнал RSI STOCHASTIC
+    const RSI_POINTS = 14;
+    const STOCHASTIC_POINTS = 7;
+
+    //Сигнал PARABOLIC SAR
+    const PARABOLIC_POINTS = 5;
+    const TRENDS_POINTS = 5;
+    const STEP_AF = 0.02;
+    const MAX_AF = 0.2;
 
 }
 
